@@ -26,7 +26,6 @@ import six
 from six.moves import xrange
 
 import warnings
-import types
 
 from . import artist
 from .artist import Artist, allow_rasterization
@@ -164,35 +163,47 @@ class ScientificCell(Cell):
                     )
         return path
 
-def _fancifyCell(cell, drawLines):
-    
-    drawPath = [Path.MOVETO, Path.MOVETO, Path.MOVETO,
-                 Path.MOVETO, Path.MOVETO]
-    if 'B' in drawLines:
-        drawPath[1] = Path.LINETO
-    if 'R' in drawLines:
-        drawPath[2] = Path.LINETO
-    if 'T' in drawLines:
-        drawPath[3] = Path.LINETO
-    if 'L' in drawLines:
-        drawPath[4] = Path.LINETO
+class FancyCell(Cell):
 
-    def new_get_path(self):
+    def __init__(self, xy, width, height,
+                 edgecolor='k', facecolor='w',
+                 fill=True,
+                 text='',
+                 loc=None,
+                 fontproperties=None,
+                 edgeVisibility="LRBT"
+                 ):
+        Cell.__init__(self, xy, width, height, edgecolor, facecolor, fill, text, loc,
+               fontproperties)
+        for letter in edgeVisibility:
+            if letter not in "LRBT":
+                msg = 'Invalid edgeVisibility params for FancyCell: {0}, must only consist of {1}.'.format(
+                        value,
+                        ", ".join({'T', 'B', 'L', 'R'}),
+                        )
+                raise ValueError(msg)
+        self._edgeVisibility = edgeVisibility
+
+
+    def get_path(self):
+
+        edgeCodes = [Path.MOVETO, Path.MOVETO, Path.MOVETO,
+                     Path.MOVETO, Path.MOVETO]
+        if 'B' in self._edgeVisibility:
+            edgeCodes[1] = Path.LINETO
+        if 'R' in self._edgeVisibility:
+            edgeCodes[2] = Path.LINETO
+        if 'T' in self._edgeVisibility:
+            edgeCodes[3] = Path.LINETO
+        if 'L' in self._edgeVisibility:
+            edgeCodes[4] = Path.LINETO
+
         path = Path([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0],
                     [0.0, 0.0]],
-                    drawPath,
+                    edgeCodes,
                     readonly=True
                     )
         return path
- 
-    cell.get_path = types.MethodType(new_get_path, cell)
-    return cell
-
-
-def _fancyCellFactory(drawLines, xy, *args, **kwargs):
-    
-    cell = Cell(xy, *args, **kwargs)
-    return _fancifyCell(cell, drawLines)
 
 
 class Table(Artist):
@@ -227,6 +238,12 @@ class Table(Artist):
              'top':          16,
              'bottom':       17,
              }
+
+    DRAWLINE_ALIASES = {'open':         '',
+                        'closed':       'LRBT',
+                        'horizontal':   'TB',
+                        'vertical':     'LR'
+                        }
 
     FONTSIZE = 10
     AXESPAD = 0.02    # the border between the axes and table edge
@@ -266,7 +283,7 @@ class Table(Artist):
         """ Add a cell to the table. """
         xy = (0, 0)
 
-        cell = _fancyCellFactory(self._drawLines, xy, *args, **kwargs)
+        cell = FancyCell(xy, edgeVisibility=self._drawLines, *args, **kwargs)
         cell.set_figure(self.figure)
         cell.set_transform(self.get_transform())
 
@@ -281,29 +298,18 @@ class Table(Artist):
     def drawLines(self, value):
         if value is None:
             pass  # Leave as previously set
-        elif value == 'open':
-            self._drawLines = ''
-        elif value == 'closed':
-            self._drawLines = 'BRTL'
-        elif value == 'horizontal':
-            self._drawLines = 'BT'
-        elif value == 'vertical':
-            self._drawLines = 'RL'
+        elif value in self.DRAWLINE_ALIASES.keys():
+            self._drawLines = self.DRAWLINE_ALIASES[value]
         else:
-            inBRTL = True
             for letter in value:
-                if letter not in "BRTL":
-                    inBRTL = False
-                    break
-            if inBRTL:
-                self._drawLines = value
-            else:
-                msg = 'Unrecognized draw lines for Cell: {0}, must be one of {1}.'.format(
-                        value,
-                        ", ".join({'open', 'closed', 'horizontal', 'vertical',
-                        'string consisting of {T, B, R, L}'}),
-                        )
-                raise ValueError(msg)
+                if letter not in "LRBT":
+                    msg = 'Unrecognized draw lines for Cell: {0}, must be one of {1}.'.format(
+                            value,
+                            ", ".join({'open', 'closed', 'horizontal', 'vertical',
+                            'string consisting of {T, B, R, L}'}),
+                            )
+                    raise ValueError(msg)
+            self._drawLines = value
 
     def _approx_text_height(self):
         return (self.FONTSIZE / 72.0 * self.figure.dpi /
@@ -541,14 +547,14 @@ def table(ax,
           cellLoc='right', colWidths=None,
           rowLabels=None, rowColours=None, rowLoc='left',
           colLabels=None, colColours=None, colLoc='center',
-          loc='bottom', bbox=None, drawLines='BRTL',
+          loc='bottom', bbox=None, drawLines='LRBT',
           **kwargs):
     """
     TABLE(cellText=None, cellColours=None,
           cellLoc='right', colWidths=None,
           rowLabels=None, rowColours=None, rowLoc='left',
           colLabels=None, colColours=None, colLoc='center',
-          loc='bottom', bbox=None, drawLines='BRTL')
+          loc='bottom', bbox=None, drawLines='LRBT')
 
     Factory function to generate a Table instance.
 

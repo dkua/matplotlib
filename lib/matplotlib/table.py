@@ -161,20 +161,20 @@ class FancyCell(Cell):
                  fontproperties=None,
                  edgeVisibility="LRBT"
                  ):
-        Cell.__init__(self, xy, width, height, edgecolor, facecolor, fill, text, loc,
-               fontproperties)
+        Cell.__init__(self, xy, width, height, edgecolor, facecolor, fill,
+                text, loc, fontproperties)
         for letter in edgeVisibility:
             if letter not in "LRBT":
-                msg = 'Invalid edgeVisibility params for FancyCell: {0}, must only consist of {1}.'.format(
+                msg = ('Invalid edgeVisibility params for FancyCell:' +
+                      '{0}, must only consist of {1}.').format(
                         value,
                         ", ".join({'T', 'B', 'L', 'R'}),
                         )
                 raise ValueError(msg)
         self._edgeVisibility = edgeVisibility
 
-
     def get_path(self):
-
+        'Return a path where the edges specificed by edgeVisibility are drawn'
         edgeCodes = [Path.MOVETO, Path.MOVETO, Path.MOVETO,
                      Path.MOVETO, Path.MOVETO]
         if 'B' in self._edgeVisibility:
@@ -291,10 +291,11 @@ class Table(Artist):
         else:
             for letter in value:
                 if letter not in "LRBT":
-                    msg = 'Unrecognized draw lines for Cell: {0}, must be one of {1}.'.format(
+                    msg = ('Unrecognized draw lines for Cell:' +
+                           ' {0}, must be one of {1}.').format(
                             value,
-                            ", ".join({'open', 'closed', 'horizontal', 'vertical',
-                            'string consisting of {T, B, R, L}'}),
+                            ", ".join({'open', 'closed', 'horizontal',
+                            'vertical', 'string consisting of {T, B, R, L}'}),
                             )
                     raise ValueError(msg)
             self._drawLines = value

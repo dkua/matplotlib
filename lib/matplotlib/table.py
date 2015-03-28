@@ -26,6 +26,7 @@ import six
 from six.moves import xrange
 
 import warnings
+import types
 
 from . import artist
 from .artist import Artist, allow_rasterization
@@ -163,6 +164,36 @@ class ScientificCell(Cell):
                     )
         return path
 
+def _fancifyCell(cell, drawLines):
+    
+    drawPath = [Path.MOVETO, Path.MOVETO, Path.MOVETO,
+                 Path.MOVETO, Path.MOVETO]
+    if 'B' in drawLines:
+        drawPath[1] = Path.LINETO
+    if 'R' in drawLines:
+        drawPath[2] = Path.LINETO
+    if 'T' in drawLines:
+        drawPath[3] = Path.LINETO
+    if 'L' in drawLines:
+        drawPath[4] = Path.LINETO
+
+    def new_get_path(self):
+        path = Path([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0],
+                    [0.0, 0.0]],
+                    drawPath,
+                    readonly=True
+                    )
+        return path
+ 
+    cell.get_path = types.MethodType(new_get_path, cell)
+    return cell
+
+
+def _fancyCellFactory(drawLines, xy, *args, **kwargs):
+    
+    cell = Cell(xy, *args, **kwargs)
+    return _fancifyCell(cell, drawLines)
+
 
 class Table(Artist):
     """
@@ -197,10 +228,6 @@ class Table(Artist):
              'bottom':       17,
              }
 
-    CELLTYPES = {'default':    Cell,
-                 'scientific': ScientificCell,
-                 }
-
     FONTSIZE = 10
     AXESPAD = 0.02    # the border between the axes and table edge
 
@@ -225,7 +252,7 @@ class Table(Artist):
 
         self._texts = []
         self._cells = {}
-        self._cellType = 'default'
+        self._drawLines = "LTRB"
         self._autoRows = []
         self._autoColumns = []
         self._autoFontsize = True
@@ -239,7 +266,7 @@ class Table(Artist):
         """ Add a cell to the table. """
         xy = (0, 0)
 
-        cell = self.CELLTYPES[self.cellType](xy, *args, **kwargs)
+        cell = _fancyCellFactory(self._drawLines, xy, *args, **kwargs)
         cell.set_figure(self.figure)
         cell.set_transform(self.get_transform())
 
@@ -247,21 +274,36 @@ class Table(Artist):
         self._cells[(row, col)] = cell
 
     @property
-    def cellType(self):
-        return self._cellType
+    def drawLines(self):
+        return self._drawLines
 
-    @cellType.setter
-    def cellType(self, value):
+    @drawLines.setter
+    def drawLines(self, value):
         if value is None:
             pass  # Leave as previously set
-        elif value in self.CELLTYPES:
-            self._cellType = value
+        elif value == 'open':
+            self._drawLines = ''
+        elif value == 'closed':
+            self._drawLines = 'BRTL'
+        elif value == 'horizontal':
+            self._drawLines = 'BT'
+        elif value == 'vertical':
+            self._drawLines = 'RL'
         else:
-            msg = 'Unrecognized type of Cell: {0}, must be one of {1}.'.format(
-                    value,
-                    ", ".join(self.CELLTYPES.keys()),
-                    )
-            raise ValueError(msg)
+            inBRTL = True
+            for letter in value:
+                if letter not in "BRTL":
+                    inBRTL = False
+                    break
+            if inBRTL:
+                self._drawLines = value
+            else:
+                msg = 'Unrecognized draw lines for Cell: {0}, must be one of {1}.'.format(
+                        value,
+                        ", ".join({'open', 'closed', 'horizontal', 'vertical',
+                        'string consisting of {T, B, R, L}'}),
+                        )
+                raise ValueError(msg)
 
     def _approx_text_height(self):
         return (self.FONTSIZE / 72.0 * self.figure.dpi /
@@ -499,14 +541,14 @@ def table(ax,
           cellLoc='right', colWidths=None,
           rowLabels=None, rowColours=None, rowLoc='left',
           colLabels=None, colColours=None, colLoc='center',
-          loc='bottom', bbox=None, cellType=None,
+          loc='bottom', bbox=None, drawLines='BRTL',
           **kwargs):
     """
     TABLE(cellText=None, cellColours=None,
           cellLoc='right', colWidths=None,
           rowLabels=None, rowColours=None, rowLoc='left',
           colLabels=None, colColours=None, colLoc='center',
-          loc='bottom', bbox=None, cellType=None)
+          loc='bottom', bbox=None, drawLines='BRTL')
 
     Factory function to generate a Table instance.
 
@@ -569,7 +611,7 @@ def table(ax,
 
     # Now create the table
     table = Table(ax, loc, bbox, **kwargs)
-    table.cellType = cellType
+    table.drawLines = drawLines
     height = table._approx_text_height()
 
     # Add the cells

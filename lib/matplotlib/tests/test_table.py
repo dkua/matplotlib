@@ -82,21 +82,21 @@ def test_label_colours():
 
 
 @image_comparison(baseline_images=['table_cell_manipulation1',
-        'table_cell_manipulation2', 'table_cell_manipulation3'],
+                  'table_cell_manipulation2', 'table_cell_manipulation3'],
                   extensions=['png', 'png', 'png'])
 def test_diff_cell_table():
     l1 = ["", "t0", "t1", "t2", "t3 ", "t4", "t5", "t6"]
     l2 = ["DLI", 35, 38, 10, 22, 25, 85, 22]
 
     test_cell = ['horizontal', 'vertical', 'open', 'closed',
-                'T', 'R', 'B', 'L']
-    
+                 'T', 'R', 'B', 'L']
+
     ax = None
-    for i in range(0,8):
-        
+    for i in range(0, 8):
+
         if (i % 4) == 0:
             fig = plt.figure()
-        
+
         ax = fig.add_subplot(4, 1, (i % 4) + 1)
         ax.plot([1, 2, 3, 4, 5, 6])
         ax.table(
@@ -119,107 +119,3 @@ def test_diff_cell_table():
         colLoc="center",
         rowLoc="center",
         )
-
-"""
-    ax1 = fig.add_subplot(4, 1, 1)
-    ax1.plot([1, 2, 3, 4, 5, 6])
-    ax1.table(
-            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-            cellText=[l1, l2],
-            loc="upper center",
-            colLoc="center",
-            rowLoc="center",
-            )
-
-    ax2 = fig.add_subplot(4, 1, 2)
-    ax2.plot([1, 2, 3, 4, 5, 6])
-    ax2.table(
-            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-            cellText=[l1, l2],
-            loc="upper center",
-            colLoc="center",
-            rowLoc="center",
-            drawLines="horizontal",
-            )
-    
-    ax3 = fig.add_subplot(4, 1, 3)
-    ax3.plot([1, 2, 3, 4, 5, 6])
-    ax3.table(
-            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-            cellText=[l1, l2],
-            loc="upper center",
-            colLoc="center",
-            rowLoc="center",
-            drawLines="vertical",
-            )
-    
-    ax4 = fig.add_subplot(4, 1, 4)
-    ax4.plot([1, 2, 3, 4, 5, 6])
-    ax4.table(
-            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-            cellText=[l1, l2],
-            loc="upper center",
-            colLoc="center",
-            rowLoc="center",
-            drawLines="open",
-            )
-    
-    fig = plt.figure()
-
-    ax1 = fig.add_subplot(4, 1, 1)
-    ax1.plot([1, 2, 3, 4, 5, 6])
-    ax1.table(
-            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-            cellText=[l1, l2],
-            loc="upper center",
-            colLoc="center",
-            rowLoc="center",
-            drawLines="closed"
-            )
-
-    ax2 = fig.add_subplot(4, 1, 2)
-    ax2.plot([1, 2, 3, 4, 5, 6])
-    ax2.table(
-            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-            cellText=[l1, l2],
-            loc="upper center",
-            colLoc="center",
-            rowLoc="center",
-            drawLines="T",
-            )
-    
-    ax3 = fig.add_subplot(4, 1, 3)
-    ax3.plot([1, 2, 3, 4, 5, 6])
-    ax3.table(
-            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-            cellText=[l1, l2],
-            loc="upper center",
-            colLoc="center",
-            rowLoc="center",
-            drawLines="R",
-            )
-    
-    ax4 = fig.add_subplot(4, 1, 4)
-    ax4.plot([1, 2, 3, 4, 5, 6])
-    ax4.table(
-            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-            cellText=[l1, l2],
-            loc="upper center",
-            colLoc="center",
-            rowLoc="center",
-            drawLines="B",
-            )
-    
-    fig = plt.figure()
-
-    ax1 = fig.add_subplot(4, 1, 1)
-    ax1.plot([1, 2, 3, 4, 5, 6])
-    ax1.table(
-            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
-            cellText=[l1, l2],
-            loc="upper center",
-            colLoc="center",
-            rowLoc="center",
-            drawLines="L"
-            )
-"""

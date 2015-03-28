@@ -81,13 +81,46 @@ def test_label_colours():
               loc='best')
 
 
-@image_comparison(baseline_images=['table_types'],
-                  extensions=['png'])
-def test_table_types():
-    fig = plt.figure()
+@image_comparison(baseline_images=['table_cell_manipulation1',
+        'table_cell_manipulation2', 'table_cell_manipulation3'],
+                  extensions=['png', 'png', 'png'])
+def test_diff_cell_table():
     l1 = ["", "t0", "t1", "t2", "t3 ", "t4", "t5", "t6"]
     l2 = ["DLI", 35, 38, 10, 22, 25, 85, 22]
 
+    test_cell = ['horizontal', 'vertical', 'open', 'closed',
+                'T', 'R', 'B', 'L']
+    
+    ax = None
+    for i in range(0,8):
+        
+        if (i % 4) == 0:
+            fig = plt.figure()
+        
+        ax = fig.add_subplot(4, 1, (i % 4) + 1)
+        ax.plot([1, 2, 3, 4, 5, 6])
+        ax.table(
+            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            cellText=[l1, l2],
+            loc="upper center",
+            colLoc="center",
+            rowLoc="center",
+            drawLines=test_cell[i]
+            )
+
+    fig = plt.figure()
+
+    ax = fig.add_subplot(4, 1, 1)
+    ax.plot([1, 2, 3, 4, 5, 6])
+    ax.table(
+        colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+        cellText=[l1, l2],
+        loc="upper center",
+        colLoc="center",
+        rowLoc="center",
+        )
+
+"""
     ax1 = fig.add_subplot(4, 1, 1)
     ax1.plot([1, 2, 3, 4, 5, 6])
     ax1.table(
@@ -106,5 +139,87 @@ def test_table_types():
             loc="upper center",
             colLoc="center",
             rowLoc="center",
-            cellType="scientific",
+            drawLines="horizontal",
             )
+    
+    ax3 = fig.add_subplot(4, 1, 3)
+    ax3.plot([1, 2, 3, 4, 5, 6])
+    ax3.table(
+            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            cellText=[l1, l2],
+            loc="upper center",
+            colLoc="center",
+            rowLoc="center",
+            drawLines="vertical",
+            )
+    
+    ax4 = fig.add_subplot(4, 1, 4)
+    ax4.plot([1, 2, 3, 4, 5, 6])
+    ax4.table(
+            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            cellText=[l1, l2],
+            loc="upper center",
+            colLoc="center",
+            rowLoc="center",
+            drawLines="open",
+            )
+    
+    fig = plt.figure()
+
+    ax1 = fig.add_subplot(4, 1, 1)
+    ax1.plot([1, 2, 3, 4, 5, 6])
+    ax1.table(
+            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            cellText=[l1, l2],
+            loc="upper center",
+            colLoc="center",
+            rowLoc="center",
+            drawLines="closed"
+            )
+
+    ax2 = fig.add_subplot(4, 1, 2)
+    ax2.plot([1, 2, 3, 4, 5, 6])
+    ax2.table(
+            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            cellText=[l1, l2],
+            loc="upper center",
+            colLoc="center",
+            rowLoc="center",
+            drawLines="T",
+            )
+    
+    ax3 = fig.add_subplot(4, 1, 3)
+    ax3.plot([1, 2, 3, 4, 5, 6])
+    ax3.table(
+            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            cellText=[l1, l2],
+            loc="upper center",
+            colLoc="center",
+            rowLoc="center",
+            drawLines="R",
+            )
+    
+    ax4 = fig.add_subplot(4, 1, 4)
+    ax4.plot([1, 2, 3, 4, 5, 6])
+    ax4.table(
+            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            cellText=[l1, l2],
+            loc="upper center",
+            colLoc="center",
+            rowLoc="center",
+            drawLines="B",
+            )
+    
+    fig = plt.figure()
+
+    ax1 = fig.add_subplot(4, 1, 1)
+    ax1.plot([1, 2, 3, 4, 5, 6])
+    ax1.table(
+            colWidths=[0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1],
+            cellText=[l1, l2],
+            loc="upper center",
+            colLoc="center",
+            rowLoc="center",
+            drawLines="L"
+            )
+"""

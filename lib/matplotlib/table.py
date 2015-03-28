@@ -147,23 +147,11 @@ class Cell(Rectangle):
         self._text.update(kwargs)
 
 
-class ScientificCell(Cell):
-    """
-    A subclass of Cell where vertical lines are ommitted.
-
-    """
-
-    def get_path(self):
-        'Return a path where vertical lines are not drawn'
-        path = Path([[0.0, 0.0], [1.0, 0.0], [1.0, 1.0], [0.0, 1.0],
-                    [0.0, 0.0]],
-                    [Path.MOVETO, Path.LINETO, Path.MOVETO, Path.LINETO,
-                    Path.CLOSEPOLY],
-                    readonly=True
-                    )
-        return path
-
 class FancyCell(Cell):
+    """
+    A subclass of Cell where vertical and horizontal lines may
+    be selectively ommited.
+    """
 
     def __init__(self, xy, width, height,
                  edgecolor='k', facecolor='w',
@@ -240,7 +228,7 @@ class Table(Artist):
              }
 
     DRAWLINE_ALIASES = {'open':         '',
-                        'closed':       'LRBT',
+                        'closed':       'LRBT',  # default
                         'horizontal':   'TB',
                         'vertical':     'LR'
                         }

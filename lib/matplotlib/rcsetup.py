@@ -309,7 +309,7 @@ class validate_nseq_float(object):
             raise ValueError(err_msg.format(n=self.n, num=len(s), s=s))
 
         try:
-            return [float(val) for val in s]
+            return [validate_float_or_None(val) for val in s]
         except ValueError:
             raise ValueError('Could not convert all entries to floats')
 

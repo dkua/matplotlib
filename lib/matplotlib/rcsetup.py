@@ -314,6 +314,27 @@ class validate_nseq_float(object):
             raise ValueError('Could not convert all entries to floats')
 
 
+class validate_nseq_float_or_None(object):
+    def __init__(self, n=None):
+        self.n = n
+
+    def __call__(self, s):
+        """return a seq of n floats, Nones or raise"""
+        if isinstance(s, six.string_types):
+            s = [x.strip() for x in s.split(',')]
+            err_msg = _str_err_msg
+        else:
+            err_msg = _seq_err_msg
+
+        if self.n is not None and len(s) != self.n:
+            raise ValueError(err_msg.format(n=self.n, num=len(s), s=s))
+
+        try:
+            return [validate_float_or_None(val) for val in s]
+        except ValueError:
+            raise ValueError('Could not convert all entries to floats or None')
+
+
 class validate_nseq_int(object):
     def __init__(self, n=None):
         self.n = n
